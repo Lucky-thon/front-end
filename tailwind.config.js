@@ -4,6 +4,14 @@ module.exports = {
   darkMode: false,
   content: [],
   theme: {
+    colors: {
+      custom_teal: {
+        100: "#E3FDFD",
+        200: "#CBF1F5",
+        300: "#A6E3E9",
+        400: "#71C9CE",
+      },
+    },
     extend: {},
   },
   variants: {
