@@ -19,7 +19,7 @@ const NavigationBar = () => {
           key={index}
           onClick={() => navigate(item.path)}
           className={`cursor-pointer ${
-            location.pathname === item.path ? 'text-black font-bold' : 'text-white'
+            location.pathname === item.path ? 'text-active_category font-bold' : 'text-black'
           } hover:text-pink-600 text-xs sm:text-sm md:text-base`}
         >
           {item.label}

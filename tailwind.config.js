@@ -6,6 +6,8 @@ module.exports = {
   theme: {
     colors: {
       background_elevated: '#E3FDFD',
+      white: '#FFFFFF',
+      active_category: '#3554E9',
       custom_teal: {
         200: '#CBF1F5',
         300: '#A6E3E9',
