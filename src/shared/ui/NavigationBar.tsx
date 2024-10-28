@@ -13,6 +13,7 @@ const NavigationBar = () => {
 
   return (
     <div className="flex justify-around items-center h-[100px] px-4 py-3 sm:px-8 sm:py-6 bg-custom_teal-300 w-full">
+      <img src="/assets/service_logo.svg" alt="our_logo" />
       {navItems.map((item, index) => (
         <span
           key={index}
