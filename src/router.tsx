@@ -1,10 +1,9 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/home/Home";
-import FindPartners from "./pages/find-partners/FindPartners";
-import SuccessAlbum from "./pages/success-album/SuccessAlbum";
-import Notification from "./pages/notification/Notification";
-import UserGuide from "./pages/user-guide/UserGuide";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/home/Home';
+import FindPartners from './pages/find-partners/FindPartners';
+import SuccessAlbum from './pages/success-album/SuccessAlbum';
+import Notification from './pages/notification/Notification';
+import UserGuide from './pages/user-guide/UserGuide';
 
 const RouterComponent = () => {
   return (
