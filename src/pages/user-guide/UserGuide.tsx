@@ -1,11 +1,12 @@
-import React from "react";
-import NavigationBar from "shared/ui/NavigationBar";
+import React, { useEffect, useState } from 'react';
+import NavigationBar from 'shared/ui/NavigationBar';
+import UserGuideScreen from 'shared/ui/UserGuideScreen';
 
-const UserGuide = () => {
+const UserGuide: React.FC = () => {
   return (
-    <div>
+    <div className="mint-background">
       <NavigationBar />
-      UserGuide
+      <UserGuideScreen />
     </div>
   );
 };
