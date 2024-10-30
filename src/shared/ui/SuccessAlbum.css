@@ -1,0 +1,26 @@
+.content {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: flex-start;
+    padding: 49px 50px;
+    gap: 20px;
+  
+    width: 800px;
+    height: auto; /* 높이를 자동으로 설정해서 내용에 맞게 늘어나도록 */
+    background: #A6E3E9; /* 민트색 배경 */
+  }
+  
+
+.box {
+    width: 150px; /* 각 카드의 너비 */
+    height: 150px; /* 각 카드의 높이 */
+    background: #D9D9D9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+  }
+  
+
