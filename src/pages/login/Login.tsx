@@ -23,9 +23,8 @@ const LoginPage: React.FC = () => {
         },
       );
       console.log('로그인 성공:', response.data);
+      localStorage.setItem('username', response.data.username);
       localStorage.setItem('token', response.data.token);
-
-      // 모든 작업이 완료된 후 네비게이트
       navigate('/');
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
