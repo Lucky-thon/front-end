@@ -23,8 +23,10 @@ const LoginPage: React.FC = () => {
         },
       );
       console.log('로그인 성공:', response.data);
-      localStorage.setItem('token', response.data.access_token); // 토큰 저장
-      navigate('/'); // 로그인 성공 후 Home 페이지로 이동
+      localStorage.setItem('token', response.data.token);
+
+      // 모든 작업이 완료된 후 네비게이트
+      navigate('/');
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         console.error('로그인 실패:', error.response.data);
