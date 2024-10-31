@@ -13,23 +13,28 @@ const LogoSplash: React.FC<{ fadingOut: boolean }> = ({ fadingOut }) => (
 );
 
 const Home: React.FC = () => {
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState<boolean>(() => {
+    return !localStorage.getItem('splashShown');
+  });
   const [fadingOut, setFadingOut] = useState(false);
 
   useEffect(() => {
-    const fadeInTimer = setTimeout(() => {
-      setFadingOut(true);
-    }, 1000);
+    if (showSplash) {
+      const fadeInTimer = setTimeout(() => {
+        setFadingOut(true);
+      }, 1000);
 
-    const hideSplashTimer = setTimeout(() => {
-      setShowSplash(false);
-    }, 2000);
+      const hideSplashTimer = setTimeout(() => {
+        setShowSplash(false);
+        localStorage.setItem('splashShown', 'true');
+      }, 2000);
 
-    return () => {
-      clearTimeout(fadeInTimer);
-      clearTimeout(hideSplashTimer);
-    };
-  }, []);
+      return () => {
+        clearTimeout(fadeInTimer);
+        clearTimeout(hideSplashTimer);
+      };
+    }
+  }, [showSplash]);
 
   return (
     <div>
@@ -39,7 +44,6 @@ const Home: React.FC = () => {
         <div className="transition-opacity duration-1000 opacity-100">
           <NavigationBar />
           <DailyMission />
-          Home
         </div>
       )}
     </div>
