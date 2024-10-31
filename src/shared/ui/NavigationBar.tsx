@@ -33,6 +33,14 @@ const NavigationBar = () => {
           location.pathname === '/notification' ? 'text-red-500' : ''
         } hover:opacity-80 h-4 w-4 sm:h-5 sm:w-5 md:h-5 md:w-5`}
       />
+      
+      {/* 프로필 설정 이미지 추가 */}
+      <img
+        src="/assets/image.png" // 여기에 이미지 경로를 적어줘
+        alt="user_avatar"
+        onClick={() => navigate('/profile')} // ProfileSettingsPage.tsx로 넘어감
+        className="cursor-pointer w-12 h-12 rounded-full mr-80"  // 크기와 둥근 테두리 설정, 오른쪽 여백 추가
+      />
     </div>
   );
 };
