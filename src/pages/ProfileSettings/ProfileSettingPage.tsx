@@ -1,10 +1,11 @@
-import React, { useState, useContext } from 'react'; // useContext 추가
+import React, { useState, useContext } from 'react';
 import NavigationBar from 'shared/ui/NavigationBar';
 import { ProfileImageContext } from "context/ProfileImageContext"; // 경로가 올바른지 확인
 
 const ProfileSettingsPage = () => {
   const [nickname, setNickname] = useState<string>('');
   const [bio, setBio] = useState<string>('');
+  const [selectedImage, setSelectedImage] = useState<string | null>(null); // 선택한 이미지를 위한 상태 추가
   const { profileImage, setProfileImage } = useContext(ProfileImageContext)!; // Context가 undefined일 가능성을 처리
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -12,7 +13,7 @@ const ProfileSettingsPage = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfileImage(reader.result as string); // 선택한 이미지를 profileImage에 저장
+        setSelectedImage(reader.result as string); // 선택한 이미지를 저장
       };
       reader.readAsDataURL(file);
     }
@@ -20,6 +21,7 @@ const ProfileSettingsPage = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setProfileImage(selectedImage); // 저장 버튼 클릭 시 이미지 변경
     console.log('Submitted:', { nickname, bio, profileImage });
   };
 
@@ -50,7 +52,7 @@ const ProfileSettingsPage = () => {
           {/* 프로필 이미지 추가 */}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
             <img 
-              src={profileImage || '/assets/image.png'}
+              src={selectedImage || profileImage || '/assets/image.png'} // 선택한 이미지 또는 기존 프로필 이미지 표시
               alt="Profile"
               style={{ width: '150px', height: '150px', borderRadius: '50%' }} 
             />
