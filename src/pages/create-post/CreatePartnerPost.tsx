@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useMutation } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 import NavigationBar from 'shared/ui/NavigationBar';
 
 const CreatePartnerPost = () => {
+  const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
@@ -13,14 +15,20 @@ const CreatePartnerPost = () => {
   };
 
   const postPartner = async (newPost: any) => {
-    const response = await fetch(`${process.env.REACT_APP_API_SERVER_URL}/api/posts/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCSRFToken(), // CSRF 토큰 추가
+    const token = localStorage.getItem('token'); // 로그인 시 저장된 인증 토큰 가져오기
+    console.log(token);
+    const response = await fetch(
+      `${process.env.REACT_APP_API_SERVER_URL}/board/api/recruitment/create/`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken(), // CSRF 토큰 추가
+          Authorization: `Token ${token}`,
+        },
+        body: JSON.stringify({ ...newPost }),
       },
-      body: JSON.stringify({ ...newPost, board: 2 }), // board ID 추가
-    });
+    );
 
     if (!response.ok) {
       throw new Error('게시글 업로드 실패');
@@ -37,6 +45,7 @@ const CreatePartnerPost = () => {
       alert('게시글이 성공적으로 업로드됐어요!');
       setTitle('');
       setContent('');
+      navigate('/find-partners');
     },
     onError: (error) => {
       console.error('Error:', error);
@@ -45,7 +54,11 @@ const CreatePartnerPost = () => {
   });
 
   const handlePostSubmit = () => {
-    mutation.mutate({ title, content }); // POST 요청 실행
+    mutation.mutate({
+      title,
+      content,
+      author: parseInt(localStorage.getItem('userId') || '1', 10), // 이거 좋은 방법이 아님, 서버에서 userId를 날려주는 것이 좋을 듯
+    }); // POST 요청 실행
   };
 
   return (

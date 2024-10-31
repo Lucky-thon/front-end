@@ -13,7 +13,7 @@ interface PartnerProps {
   id: number;
   title: string;
   content: string;
-  username: string;
+  author: string;
   comments: Comment[];
 }
 
@@ -31,7 +31,9 @@ const FindPartners = () => {
     isLoading,
     isError,
   } = useQuery('partners', async () => {
-    const response = await axios.get(`${process.env.REACT_APP_API_SERVER_URL}/api/posts/?board=2`);
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_SERVER_URL}/board/api/recruitment/`,
+    );
     return response.data;
   });
 
@@ -63,7 +65,7 @@ const FindPartners = () => {
         selectedPost.comments = [];
       }
 
-      selectedPost.comments.push({ username: selectedPost.username, content: comment });
+      selectedPost.comments.push({ username: selectedPost.author, content: comment });
 
       setSelectedPost({ ...selectedPost });
       setComment('');
@@ -101,7 +103,7 @@ const FindPartners = () => {
               >
                 <h3 className="text-lg font-semibold">제목: {partner.title}</h3>
                 <p>내용: {partner.content}</p>
-                <p>작성자: {partner.username}</p>
+                <p>작성자: {partner.author}</p>
               </li>
             ))}
           </ul>
