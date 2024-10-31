@@ -1,22 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NavigationBar from 'shared/ui/NavigationBar';
+import { useQuery } from 'react-query';
+import axios from 'axios';
 
 interface NotificationProps {
   id: number;
   content: string;
 }
 
-// 샘플 알림 데이터
-const notification_sample: NotificationProps[] = [
-  { id: 1, content: ' 새로운 미션이 도착했습니다!' },
-  { id: 2, content: ' 친구가 댓글을 남겼습니다!' },
-  { id: 3, content: ' 오늘의 미션이 완료되었습니다!' },
-  { id: 4, content: ' 친구 요청을 수락했습니다!' },
-  { id: 5, content: ' 점수가 업데이트되었습니다!' },
-];
-
 const Notification = () => {
-  const [notifications] = useState(notification_sample); // 알림 데이터 상태
+  const [notifications, setNotifications] = useState<NotificationProps[]>([]); // 알림 데이터 상태
+
+  // 알림 데이터를 서버에서 Fetch
+  const fetchNotifications = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('로그인 토큰이 없습니다. 다시 로그인해주세요.');
+    }
+    const response = await axios.get(`${process.env.REACT_APP_API_SERVER_URL}/notifications/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    });
+    return response.data;
+  };
+
+  const { data, isLoading, isError, refetch } = useQuery('notifications', fetchNotifications, {
+    refetchInterval: 60000, // 1분마다 자동으로 데이터 갱신
+  });
+
+  useEffect(() => {
+    if (data) {
+      setNotifications(data);
+    }
+  }, [data]);
+
+  if (isLoading) return <div>로딩 중...</div>;
+  if (isError) return <div>알림을 불러오는 데 실패했습니다...</div>;
 
   return (
     <div>
@@ -30,7 +50,9 @@ const Notification = () => {
                 key={notification.id}
                 className="bg-white p-4 my-2 rounded-lg shadow-md transition duration-200"
               >
-                <p><strong>알림 {notification.id}:</strong> {notification.content}</p>
+                <p>
+                  <strong>알림 {notification.id}:</strong> {notification.content}
+                </p>
               </li>
             ))}
           </ul>
