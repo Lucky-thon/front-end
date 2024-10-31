@@ -26,10 +26,6 @@ const RouterComponent = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route
-          path="/"
-          element={<ProtectedRoute element={<Home />} isAuthenticated={isAuthenticated} />}
-        />
-        <Route
           path="/find-partners"
           element={<ProtectedRoute element={<FindPartners />} isAuthenticated={isAuthenticated} />}
         />
@@ -62,6 +58,10 @@ const RouterComponent = () => {
           element={
             <ProtectedRoute element={<CreateSuccessPost />} isAuthenticated={isAuthenticated} />
           }
+        />
+        <Route
+          path="/"
+          element={<ProtectedRoute element={<Home />} isAuthenticated={isAuthenticated} />}
         />
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
