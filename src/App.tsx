@@ -1,11 +1,12 @@
 import React from "react";
 import RouterComponent from "./router";
+import { ProfileImageProvider } from "context/ProfileImageContext"; // ProfileImageProvider 임포트
 
 function App() {
   return (
-    <div>
+    <ProfileImageProvider>
       <RouterComponent />
-    </div>
+    </ProfileImageProvider>
   );
 }
 

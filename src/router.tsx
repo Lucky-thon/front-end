@@ -11,6 +11,7 @@ import SignUpPage from 'pages/SignUp/SignUpPage';
 import LoginPage from 'pages/login/Login';
 import ProtectedRoute from 'routes/ProtectedRoute';
 
+
 const RouterComponent = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
 
@@ -57,6 +58,8 @@ const RouterComponent = () => {
           }
         />
         <Route path="*" element={<div>404 Not Found</div>} />
+        <Route path="/profile" element={< ProfileSettingPage/>} />
+
       </Routes>
     </Router>
   );
