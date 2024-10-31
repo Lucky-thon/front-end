@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react'; // useContext 추가
 import NavigationBar from 'shared/ui/NavigationBar';
+import { ProfileImageContext } from "context/ProfileImageContext"; // 경로가 올바른지 확인
 
 const ProfileSettingsPage = () => {
   const [nickname, setNickname] = useState<string>('');
   const [bio, setBio] = useState<string>('');
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const { profileImage, setProfileImage } = useContext(ProfileImageContext)!; // Context가 undefined일 가능성을 처리
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfileImage(reader.result as string);
+        setProfileImage(reader.result as string); // 선택한 이미지를 profileImage에 저장
       };
       reader.readAsDataURL(file);
     }
