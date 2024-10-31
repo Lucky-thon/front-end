@@ -8,7 +8,7 @@ const SignUpPage: React.FC = () => {
 
         <div className="bg-white rounded-lg shadow-lg p-8 w-100">
           <form>
-            <input type="text" placeholder="이름" className="border p-2 mb-3 w-full" />
+            <input type="id" placeholder="새 아이디" className="border p-2 mb-3 w-full" />
             <input type="password" placeholder="새 비밀번호" className="border p-2 mb-3 w-full" />
             <button type="submit" className="bg-[#8ed0d4] text-white py-2 px-4 rounded w-full">
               회원가입

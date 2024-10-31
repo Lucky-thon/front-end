@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import DailyMission from 'shared/ui/DailyMission';
 import NavigationBar from 'shared/ui/NavigationBar';
+import { useNavigate } from 'react-router-dom';
 
 const LogoSplash: React.FC<{ fadingOut: boolean }> = ({ fadingOut }) => (
   <div
@@ -15,6 +16,7 @@ const LogoSplash: React.FC<{ fadingOut: boolean }> = ({ fadingOut }) => (
 const Home: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [fadingOut, setFadingOut] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fadeInTimer = setTimeout(() => {
@@ -23,13 +25,14 @@ const Home: React.FC = () => {
 
     const hideSplashTimer = setTimeout(() => {
       setShowSplash(false);
+      navigate('/login'); // 페이드아웃 후 로그인 페이지로 이동
     }, 2000);
 
     return () => {
       clearTimeout(fadeInTimer);
       clearTimeout(hideSplashTimer);
     };
-  }, []);
+  }, [navigate]);
 
   return (
     <div>

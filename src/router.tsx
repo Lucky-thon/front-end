@@ -6,6 +6,8 @@ import Notification from './pages/notification/Notification';
 import UserGuide from './pages/user-guide/UserGuide';
 import CreatePartnerPost from 'pages/create-post/CreatePartnerPost';
 import CreateSuccessPost from 'pages/success-post/CreateSuccessPost';
+import LoginPage from './pages/Login/LoginPage';
+import SignUpPage from './pages/SignUp/SignUpPage';
 
 const RouterComponent = () => {
   return (
@@ -18,6 +20,8 @@ const RouterComponent = () => {
         <Route path="/create-partner-post" element={<CreatePartnerPost />} />
         <Route path="/create-success-post" element={<CreateSuccessPost />} />
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
     </Router>
