@@ -10,7 +10,7 @@ import CreateSuccessPost from 'pages/success-post/CreateSuccessPost';
 import SignUpPage from 'pages/SignUp/SignUpPage';
 import LoginPage from 'pages/login/Login';
 import ProtectedRoute from 'routes/ProtectedRoute';
-
+import ProfileSettingPage from 'pages/ProfileSettings/ProfileSettingPage';
 
 const RouterComponent = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
@@ -46,6 +46,12 @@ const RouterComponent = () => {
           element={<ProtectedRoute element={<UserGuide />} isAuthenticated={isAuthenticated} />}
         />
         <Route
+          path="/profile"
+          element={
+            <ProtectedRoute element={<ProfileSettingPage />} isAuthenticated={isAuthenticated} />
+          }
+        />
+        <Route
           path="/create-partner-post"
           element={
             <ProtectedRoute element={<CreatePartnerPost />} isAuthenticated={isAuthenticated} />
@@ -58,8 +64,6 @@ const RouterComponent = () => {
           }
         />
         <Route path="*" element={<div>404 Not Found</div>} />
-        <Route path="/profile" element={< ProfileSettingPage/>} />
-
       </Routes>
     </Router>
   );
