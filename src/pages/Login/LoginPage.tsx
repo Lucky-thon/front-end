@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+
 
 const LoginPage: React.FC = () => {
   return (
@@ -14,9 +14,9 @@ const LoginPage: React.FC = () => {
               로그인
             </button>
           </form>
-          <Link to="/signup" className="text-blue-500 text-sm mt-4 inline-block">
+          <a href="/signup" className="text-[#007acc] text-sm mt-4 inline-block">
             또는 회원가입하기
-          </Link>
+          </a>
         </div>
       </div>
     </div>
