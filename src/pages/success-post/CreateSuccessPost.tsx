@@ -61,7 +61,7 @@ const CreateSuccessPost = () => {
       setTitle('');
       setContent('');
       setSelectedImage(null);
-      navigate('success-album'); // 미션 성공 게시판으로 이동
+      navigate('/success-album'); // 미션 성공 게시판으로 이동
     },
     onError: (error) => {
       console.error('Error:', error);
@@ -74,7 +74,7 @@ const CreateSuccessPost = () => {
       title,
       content,
       image: selectedImage,
-      author: parseInt(localStorage.getItem('userId') || '1', 10),
+      author: parseInt(localStorage.getItem('userId') || '1', 10), // 이거 좋은 방법이 아님, 서버에서 userId를 날려주는 것이 좋을 듯
     });
   };
 
