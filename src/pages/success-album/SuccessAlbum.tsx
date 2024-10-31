@@ -1,55 +1,63 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavigationBar from 'shared/ui/NavigationBar';
-import 'shared/ui/SuccessAlbum.css'; // 경로는 사용하는 컴포넌트 파일 기준으로 작성
-import image1 from './sample.jpeg'; 
+import { useQuery } from 'react-query';
+import axios from 'axios';
 
-
-interface Comment { // 댓글을 작성한 사용자 이름과 댓글 내용 
-  username: string; // 댓글 작성자의 이름 필드 추가
+interface Comment {
+  username: string;
   content: string;
 }
 
-interface SuccessPostProps { // 게시글의 구조 정의하는 인터페이스
+interface SuccessPostProps {
+  id: number;
   title: string;
   content: string;
-  username: string;
+  author: number;
+  image: string;
+  created_at: string;
   comments: Comment[];
-  imageUrl: string;
 }
-
-const SuccessPost_sample = [ // 예시 게시글 데이터를 저장하는 배열
-  {title: '1번', content: '정보대 창업라운지에서 찍었어요!', username: 'park', imageUrl:image1 },
-  {title: '2번', content: '정보대 111호에서 찍었어요!!', username: '쿄쿄', imageUrl:image1 },
-  {title: '3번', content: '정보대 창업라운지에서 찍었어요!', username: 'd', imageUrl:image1 },
-  {title: '4번', content: '정보대 창업라운지에서 찍었어요!', username: 's', imageUrl:image1 },
-  {title: '5번', content: '정보대 창업라운지에서 찍었어요!', username: 'v', imageUrl:image1 },
-  {title: '6번', content: '정보대 창업라운지에서 찍었어요!', username: 'c', imageUrl:image1 },
-  {title: '7번', content: '정보대 창업라운지에서 찍었어요!', username: 'g', imageUrl:image1 },
-
-
-];
-
 
 const SuccessAlbum = () => {
   const navigate = useNavigate();
   const [selectedPost, setSelectedPost] = useState<SuccessPostProps | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [comment, setComment] = useState(''); // 댓글 입력 상태
+  const [comment, setComment] = useState('');
   const itemsPerPage = 6;
-  const totalPages = Math.ceil(SuccessPost_sample.length / itemsPerPage);
+
+  // 데이터 Fetching을 위한 useQuery 사용
+  const {
+    data: successPosts,
+    isLoading,
+    isError,
+  } = useQuery('successPosts', async () => {
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_SERVER_URL}/board/api/mission-success/`,
+    );
+    return response.data;
+  });
+
+  if (isLoading) return <div>로딩 중...</div>;
+  if (isError) return <div>데이터를 불러오는 데 실패했어요...</div>;
+
+  const totalPages = Math.ceil(successPosts.length / itemsPerPage);
+  const paginatedPosts = successPosts.slice(
+    currentPage * itemsPerPage,
+    currentPage * itemsPerPage + itemsPerPage,
+  );
 
   const handlePostSubmit = () => {
     navigate('/create-success-post');
   };
 
-  const openModal = (post: any) => {
+  const openModal = (post: SuccessPostProps) => {
     setSelectedPost(post);
   };
 
   const closeModal = () => {
     setSelectedPost(null);
-    setComment(''); // 모달을 닫을 때 댓글 입력 초기화
+    setComment('');
   };
 
   const addComment = () => {
@@ -59,19 +67,12 @@ const SuccessAlbum = () => {
         selectedPost.comments = [];
       }
 
-      // 댓글 추가
-      selectedPost.comments.push({ username: selectedPost.username, content: comment });
+      selectedPost.comments.push({ username: '현재 사용자', content: comment });
 
-      // 상태 업데이트
-      setSelectedPost({ ...selectedPost }); // 상태 업데이트로 리렌더링 강제
-      setComment(''); // 댓글 추가 후 입력 초기화
+      setSelectedPost({ ...selectedPost });
+      setComment('');
     }
   };
-
-  const paginatedPartners = SuccessPost_sample.slice(
-    currentPage * itemsPerPage,
-    currentPage * itemsPerPage + itemsPerPage,
-  );
 
   const goToPreviousPage = () => {
     if (currentPage > 0) setCurrentPage(currentPage - 1);
@@ -85,7 +86,7 @@ const SuccessAlbum = () => {
     <div>
       <NavigationBar />
       <div className="flex justify-center m-4 sm:m-10">
-        <div className="flex flex-col gap-3 bg-custom_teal-300 p-8 sm:p-10 h-auto min-h-screen w-auto max-h-[2000px] min-w-[500px] max-w-[600px] rounded-lg shadow-lg">
+        <div className="flex flex-col gap-3 bg-custom_teal-300 p-8 sm:p-10 h-auto min-h-screen w-auto max-h-[2000px] min-w-[800px] max-w-[1000px] rounded-lg shadow-lg">
           <div className="flex justify-between">
             <h2 className="text-xl sm:text-2xl font-semibold mb-4">미션 성공</h2>
             <div
@@ -96,19 +97,22 @@ const SuccessAlbum = () => {
             </div>
           </div>
           <ul className="w-full">
-          {paginatedPartners.map((partner, index) => (
-  <li
-    key={index}
-    className="bg-white p-4 my-2 rounded-lg shadow-md hover:bg-background_elevated transition duration-200 cursor-pointer"
-    onClick={() => openModal(partner)}
-  >
-    <img src={partner.imageUrl} alt="sample" className="mb-2 w-24 h-24 object-cover rounded-md" /> {/* 이미지 크기 조절 */}
-    <h3 className="text-lg font-semibold">Title: {partner.title}</h3>
-    <p>Content: {partner.content}</p>
-    <p>Username: {partner.username}</p>
-  </li>
-))}
-
+            {paginatedPosts.map((post: SuccessPostProps) => (
+              <li
+                key={post.id}
+                className="bg-white p-4 my-2 rounded-lg shadow-md hover:bg-background_elevated transition duration-200 cursor-pointer"
+                onClick={() => openModal(post)}
+              >
+                <img
+                  src={post.image}
+                  alt="미션 성공 이미지"
+                  className="mb-2 w-24 h-24 object-cover rounded-md"
+                />
+                <h3 className="text-lg font-semibold">Title: {post.title}</h3>
+                <p>Content: {post.content}</p>
+                <p>Author ID: {post.author}</p>
+              </li>
+            ))}
           </ul>
           <div className="flex justify-center mt-4">
             {currentPage > 0 && (
@@ -131,8 +135,8 @@ const SuccessAlbum = () => {
         </div>
       </div>
 
-     {/* Modal */}
-     {selectedPost && (
+      {/* Modal */}
+      {selectedPost && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-[800px] w-full">
             <div className="mb-2">
@@ -153,8 +157,8 @@ const SuccessAlbum = () => {
               className="w-full p-2 border rounded mb-4"
               placeholder="댓글을 입력하세요"
               rows={4}
-              onChange={(e) => setComment(e.target.value)} // 댓글 상태 업데이트
-              value={comment} // 댓글 상태로 입력 필드 설정
+              onChange={(e) => setComment(e.target.value)}
+              value={comment}
             ></textarea>
             <div className="flex justify-end gap-2">
               <button

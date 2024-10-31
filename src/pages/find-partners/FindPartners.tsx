@@ -1,72 +1,74 @@
 import React, { useState } from 'react';
 import NavigationBar from 'shared/ui/NavigationBar';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from 'react-query';
+import axios from 'axios';
 
 interface Comment {
-  username: string; // 댓글 작성자의 이름 필드 추가
+  username: string;
   content: string;
 }
 
 interface PartnerProps {
+  id: number;
   title: string;
   content: string;
   username: string;
   comments: Comment[];
 }
 
-// 데이터 예시
-const partner_sample = [
-  { title: '1번', content: '안녕하세요, 박병욱입니다!!! 같이 미션해요~~', username: 'park' },
-  { title: '2번', content: '안녕하세요, 이재현입니다!!! 같이 미션해요~~', username: 'lee' },
-  { title: '3번', content: '안녕하세요, 이성민입니다!!! 같이 미션해요~~', username: 'lee sung' },
-  { title: '4번', content: '안녕하세요, 김경재입니다!!! 같이 미션해요~~', username: 'kim' },
-  { title: '5번', content: '안녕하세요, 이정진입니다!!! 같이 미션해요~~', username: 'lee jung' },
-  { title: '6번', content: '안녕하세요, 전민경입니다!!! 같이 미션해요~~', username: 'jeon' },
-  { title: '7번', content: '안녕하세요, 임재영입니다!!! 같이 미션해요~~', username: 'lim' },
-  { title: '8번', content: '안녕하세요, 배경석입니다!!! 같이 미션해요~~', username: 'bae' },
-];
-
 const FindPartners = () => {
   const navigate = useNavigate();
   const [selectedPost, setSelectedPost] = useState<PartnerProps | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [comment, setComment] = useState(''); // 댓글 입력 상태
+  const [comment, setComment] = useState('');
+
   const itemsPerPage = 6;
-  const totalPages = Math.ceil(partner_sample.length / itemsPerPage);
+
+  // 데이터 Fetching을 위한 useQuery 사용
+  const {
+    data: partners,
+    isLoading,
+    isError,
+  } = useQuery('partners', async () => {
+    const response = await axios.get(`${process.env.REACT_APP_API_SERVER_URL}/api/posts/?board=2`);
+    return response.data;
+  });
+
+  if (isLoading) return <div>로딩 중...</div>;
+  if (isError) return <div>데이터를 불러오는 데 실패했어요...</div>;
+
+  const totalPages = Math.ceil(partners.length / itemsPerPage);
+  const paginatedPartners = partners.slice(
+    currentPage * itemsPerPage,
+    currentPage * itemsPerPage + itemsPerPage,
+  );
 
   const handlePostSubmit = () => {
     navigate('/create-partner-post');
   };
 
-  const openModal = (post: any) => {
+  const openModal = (post: PartnerProps) => {
     setSelectedPost(post);
   };
 
   const closeModal = () => {
     setSelectedPost(null);
-    setComment(''); // 모달을 닫을 때 댓글 입력 초기화
+    setComment('');
   };
 
   const addComment = () => {
     if (selectedPost && comment.trim()) {
-      // 댓글 배열이 존재하지 않으면 초기화
       if (!selectedPost.comments) {
         selectedPost.comments = [];
       }
 
-      // 댓글 추가
       selectedPost.comments.push({ username: selectedPost.username, content: comment });
 
-      // 상태 업데이트
-      setSelectedPost({ ...selectedPost }); // 상태 업데이트로 리렌더링 강제
-      setComment(''); // 댓글 추가 후 입력 초기화
+      setSelectedPost({ ...selectedPost });
+      setComment('');
     }
   };
-
-  const paginatedPartners = partner_sample.slice(
-    currentPage * itemsPerPage,
-    currentPage * itemsPerPage + itemsPerPage,
-  );
 
   const goToPreviousPage = () => {
     if (currentPage > 0) setCurrentPage(currentPage - 1);
@@ -80,7 +82,7 @@ const FindPartners = () => {
     <div>
       <NavigationBar />
       <div className="flex justify-center m-4 sm:m-10">
-        <div className="flex flex-col gap-3 bg-custom_teal-300 p-8 sm:p-10 h-auto w-auto min-h-[400px] max-h-[900px] min-w-[600px] max-w-[800px] rounded-lg shadow-lg">
+        <div className="flex flex-col gap-3 bg-custom_teal-300 p-8 sm:p-10 h-auto w-auto min-h-[400px] max-h-[900px] min-w-[800px] max-w-[1000px] rounded-lg shadow-lg">
           <div className="flex justify-between">
             <h2 className="text-xl sm:text-2xl font-semibold mb-4">인원 모집</h2>
             <div
@@ -91,19 +93,19 @@ const FindPartners = () => {
             </div>
           </div>
           <ul className="w-full">
-            {paginatedPartners.map((partner, index) => (
+            {paginatedPartners.map((partner: PartnerProps) => (
               <li
-                key={index}
+                key={partner.id}
                 className="bg-white p-4 my-2 rounded-lg shadow-md hover:bg-background_elevated transition duration-200 cursor-pointer"
                 onClick={() => openModal(partner)}
               >
-                <h3 className="text-lg font-semibold">Title: {partner.title}</h3>
-                <p>Content: {partner.content}</p>
-                <p>Username: {partner.username}</p>
+                <h3 className="text-lg font-semibold">제목: {partner.title}</h3>
+                <p>내용: {partner.content}</p>
+                <p>작성자: {partner.username}</p>
               </li>
             ))}
           </ul>
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center mt-4 gap-96">
             {currentPage > 0 && (
               <button
                 onClick={goToPreviousPage}
@@ -146,8 +148,8 @@ const FindPartners = () => {
               className="w-full p-2 border rounded mb-4"
               placeholder="댓글을 입력하세요"
               rows={4}
-              onChange={(e) => setComment(e.target.value)} // 댓글 상태 업데이트
-              value={comment} // 댓글 상태로 입력 필드 설정
+              onChange={(e) => setComment(e.target.value)}
+              value={comment}
             ></textarea>
             <div className="flex justify-end gap-2">
               <button

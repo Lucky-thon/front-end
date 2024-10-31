@@ -6,15 +6,20 @@ const CreatePartnerPost = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
-  // POST 요청 처리 함수
+  // CSRF 토큰을 가져오는 함수
+  const getCSRFToken = () => {
+    const match = document.cookie.match(/csrftoken=([^;]+)/);
+    return match ? match[1] : '';
+  };
+
   const postPartner = async (newPost: any) => {
-    const response = await fetch('https://API주소/엔드포인트', {
-      // 서버 URL이랑 endpoint 완성 시 여기다 갈기기
+    const response = await fetch(`${process.env.REACT_APP_API_SERVER_URL}/api/posts/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-CSRFToken': getCSRFToken(), // CSRF 토큰 추가
       },
-      body: JSON.stringify(newPost),
+      body: JSON.stringify({ ...newPost, board: 2 }), // board ID 추가
     });
 
     if (!response.ok) {

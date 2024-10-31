@@ -1,31 +1,57 @@
 import React, { useState } from 'react';
 import { useMutation } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 import NavigationBar from 'shared/ui/NavigationBar';
 
 const CreateSuccessPost = () => {
+  const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   // 이미지 선택 핸들러 함수
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setSelectedImage(URL.createObjectURL(file));
+      setSelectedImage(file);
     }
   };
 
+  // 이미지 파일과 제목/내용을 FormData 객체에 담아 서버로 전송
   const postSuccess = async (newPost: any) => {
-    const response = await fetch('https://API주소/엔드포인트', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const token = localStorage.getItem('token'); // 로그인 시 저장된 인증 토큰 가져오기
+
+    if (!token) {
+      throw new Error('로그인 토큰이 없습니다.');
+    }
+
+    const formData = new FormData();
+    formData.append('title', newPost.title);
+    formData.append('content', newPost.content);
+    formData.append('author', String(newPost.author));
+    if (newPost.image) {
+      formData.append('image', newPost.image);
+    }
+
+    const response = await fetch(
+      `${process.env.REACT_APP_API_SERVER_URL}/board/api/mission-success/create/`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Token ${token}`,
+          Accept: 'application/json',
+        },
+        body: formData,
+        credentials: 'include', // 쿠키와 같은 자격 증명을 포함하도록 설정
       },
-      body: JSON.stringify(newPost),
-    });
+    );
+
     if (!response.ok) {
+      console.error('HTTP 상태 코드:', response.status);
+      console.error('응답 메시지:', await response.text());
       throw new Error('게시글 업로드 실패');
     }
+
     return await response.json();
   };
 
@@ -35,6 +61,7 @@ const CreateSuccessPost = () => {
       setTitle('');
       setContent('');
       setSelectedImage(null);
+      navigate('success-album'); // 미션 성공 게시판으로 이동
     },
     onError: (error) => {
       console.error('Error:', error);
@@ -43,7 +70,12 @@ const CreateSuccessPost = () => {
   });
 
   const handlePostSubmit = () => {
-    mutation.mutate({ title, content });
+    mutation.mutate({
+      title,
+      content,
+      image: selectedImage,
+      author: parseInt(localStorage.getItem('userId') || '1', 10),
+    });
   };
 
   return (
@@ -62,12 +94,28 @@ const CreateSuccessPost = () => {
 
         <div className="relative mb-4">
           {selectedImage && (
-            <img src={selectedImage} alt="미리보기" className="w-48 h-48 object-cover mx-auto rounded mb-4" />
+            <img
+              src={URL.createObjectURL(selectedImage)}
+              alt="미리보기"
+              className="w-48 h-48 object-cover mx-auto rounded mb-4"
+            />
           )}
         </div>
 
         <div className="SuccessPost_content mb-3">
-          <label htmlFor="content" className="block text-black mb-1">
+          <label htmlFor="title" className="block text-black mb-1">
+            제목
+          </label>
+          <input
+            type="text"
+            id="title"
+            className="SuccessPost_title w-full mt-1 p-2 border border-gray-300 rounded"
+            placeholder="제목을 입력하세요"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+
+          <label htmlFor="content" className="block text-black mt-4 mb-1">
             글 내용
           </label>
           <textarea
