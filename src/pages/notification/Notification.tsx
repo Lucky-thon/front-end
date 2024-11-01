@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import NavigationBar from 'shared/ui/NavigationBar';
 import { useQuery } from 'react-query';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 interface NotificationProps {
   id: number;
@@ -12,6 +13,7 @@ interface NotificationProps {
 }
 
 const Notification = () => {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState<NotificationProps[]>([]); // 알림 데이터 상태
   const [unreadCount, setUnreadCount] = useState<number>(0); // 읽지 않은 알림 개수
 
@@ -97,10 +99,11 @@ const Notification = () => {
       console.error('Failed to update notification status:', error);
     }
 
-    // 클릭한 알림의 URL로 이동
     const notification = notifications.find((notif) => notif.id === notificationId);
     if (notification) {
-      window.location.href = notification.target_url;
+      navigate(notification.target_url, {
+        state: { id: notificationId }, // 게시글 id 전달
+      });
     }
   };
 

@@ -58,6 +58,7 @@ const CreateSuccessPost = () => {
   const mutation = useMutation(postSuccess, {
     onSuccess: (data) => {
       console.log('Success data:', data); // 받아온 데이터 콘솔로 확인
+      console.log(data.auth);
       alert('게시글이 성공적으로 업로드됐어요!');
       setTitle('');
       setContent('');

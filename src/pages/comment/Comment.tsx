@@ -1,53 +1,56 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import NavigationBar from 'shared/ui/NavigationBar';
 import axios from 'axios';
 
 interface Comment {
+  id: number;
   comment: string;
   post: number;
   writer: string;
+  create_at: string;
 }
 
 const CommentPage: React.FC = () => {
   const location = useLocation();
-  const { title, author, content, comments: initialComments = [], id } = location.state || {};
-
-  // comments 상태를 추가하여 댓글 목록을 관리
-  const [comments, setComments] = useState<Comment[]>(initialComments);
+  const { title, author, content, id } = location.state || {};
+  const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
 
-  useEffect(() => {
-    // 페이지 로드 시 댓글을 가져오는 GET 요청
-    const fetchComments = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_SERVER_URL}/board/api/recruitment/comments/${id}`,
-          {
-            headers: {
-              Authorization: `Token ${localStorage.getItem('token')}`,
-            },
+  const fetchComments = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_SERVER_URL}/board/api/recruitment/comments/${id}`,
+        {
+          headers: {
+            Authorization: `Token ${localStorage.getItem('token')}`,
           },
-        );
-        setComments(response.data);
-      } catch (error) {
-        console.error('댓글 가져오기 실패:', error);
-      }
-    };
+        },
+      );
+      console.log('댓글 가져오기 성공:', response.data);
 
-    fetchComments();
+      setComments(response.data);
+    } catch (error) {
+      console.error('댓글 가져오기 실패:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('서버 응답 오류:', error.response.data);
+      }
+    }
   }, [id]);
+
+  useEffect(() => {
+    fetchComments(); // 페이지 로드 시 댓글을 가져오는 GET 요청
+  }, [fetchComments]);
 
   const handleAddComment = async () => {
     if (newComment.trim()) {
       try {
-        // API 호출하여 댓글 추가
         const response = await axios.post(
           `${process.env.REACT_APP_API_SERVER_URL}/board/api/recruitment/comments/create/${id}`,
           {
-            comment: newComment, // 댓글 내용
-            post: id, // 게시글 ID (숫자 형태로 전달)
-            writer: location.state.writer, // 작성자 정보 추가
+            comment: newComment,
+            post: id,
+            writer: location.state.writer,
           },
           {
             headers: {
@@ -56,12 +59,10 @@ const CommentPage: React.FC = () => {
           },
         );
 
-        console.log('댓글 추가 성공:', response.data); // 응답 데이터를 콘솔에 찍기
-
-        // 성공적으로 댓글 추가 후 상태 업데이트
-        const newCommentData = response.data;
-        setComments([...comments, newCommentData]);
-        setNewComment(''); // 입력 필드 초기화
+        console.log('댓글 추가 성공:', response.data);
+        setComments((prevComments) => [...prevComments, response.data]);
+        setNewComment('');
+        fetchComments(); // 댓글 추가 후 다시 가져오기
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
           console.error('댓글 추가 실패:', error.response.data);
@@ -85,8 +86,8 @@ const CommentPage: React.FC = () => {
           <div className="mb-6">
             <h3 className="text-lg font-semibold">댓글</h3>
             {comments.length > 0 ? (
-              comments.map((comment, index) => (
-                <div key={index} className="bg-white p-2 my-2 rounded-lg shadow-md border">
+              comments.map((comment) => (
+                <div key={comment.id} className="bg-white p-2 my-2 rounded-lg shadow-md border">
                   <strong>{comment.writer}</strong>: {comment.comment}
                 </div>
               ))
