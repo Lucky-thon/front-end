@@ -52,11 +52,13 @@ const FindPartners = () => {
 
   const openModal = (post: PartnerProps) => {
     setSelectedPost(post);
+    window.history.pushState(null, '', `/find-partners/${post.id}`);
   };
 
   const closeModal = () => {
     setSelectedPost(null);
     setComment('');
+    navigate('/find-partners');
   };
 
   const addComment = () => {

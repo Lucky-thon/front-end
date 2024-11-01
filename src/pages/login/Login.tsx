@@ -22,6 +22,7 @@ const LoginPage: React.FC = () => {
           password,
         },
       );
+      //  로그인해서 response.data를 확인 -> 그 안에 내 아이디 그대로 들어있는 필드 있는지 확인 -> 그 필드 갈기기
       console.log('로그인 성공:', response.data);
       localStorage.setItem('username', response.data.username);
       localStorage.setItem('token', response.data.token);
