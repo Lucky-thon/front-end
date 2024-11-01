@@ -28,6 +28,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated }) => {
       );
       //  로그인해서 response.data를 확인 -> 그 안에 내 아이디 그대로 들어있는 필드 있는지 확인 -> 그 필드 갈기기
       console.log('로그인 성공:', response.data);
+      console.log('로그인 응답 데이터:', JSON.stringify(response.data, null, 2)); // 전체 응답을 JSON 형식으로 출력
       localStorage.setItem('username', response.data.username);
       localStorage.setItem('token', response.data.token);
       setIsAuthenticated(true); // 로그인 성공 시 인증 상태를 true로 설정

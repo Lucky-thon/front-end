@@ -1,30 +1,22 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavigationBar from 'shared/ui/NavigationBar';
 import { useQuery } from 'react-query';
 import axios from 'axios';
 
-interface Comment {
-  username: string;
-  content: string;
-}
-
 interface SuccessPostProps {
   id: number;
   title: string;
-  content: string;
   author: number;
   image: string;
   created_at: string;
-  comments: Comment[];
 }
 
 const SuccessAlbum = () => {
   const navigate = useNavigate();
   const [selectedPost, setSelectedPost] = useState<SuccessPostProps | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [comment, setComment] = useState('');
-  const itemsPerPage = 6;
+  const itemsPerPage = 9;
 
   // 데이터 Fetching을 위한 useQuery 사용
   const {
@@ -57,21 +49,6 @@ const SuccessAlbum = () => {
 
   const closeModal = () => {
     setSelectedPost(null);
-    setComment('');
-  };
-
-  const addComment = () => {
-    if (selectedPost && comment.trim()) {
-      // 댓글 배열이 존재하지 않으면 초기화
-      if (!selectedPost.comments) {
-        selectedPost.comments = [];
-      }
-
-      selectedPost.comments.push({ username: '현재 사용자', content: comment });
-
-      setSelectedPost({ ...selectedPost });
-      setComment('');
-    }
   };
 
   const goToPreviousPage = () => {
@@ -96,21 +73,21 @@ const SuccessAlbum = () => {
               작성하기
             </div>
           </div>
-          <ul className="w-full">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
             {paginatedPosts.map((post: SuccessPostProps) => (
               <li
                 key={post.id}
-                className="bg-white p-4 my-2 rounded-lg shadow-md hover:bg-background_elevated transition duration-200 cursor-pointer"
+                className="bg-white p-4 rounded-lg shadow-md hover:bg-background_elevated transition duration-200 cursor-pointer"
                 onClick={() => openModal(post)}
               >
                 <img
                   src={post.image}
                   alt="미션 성공 이미지"
-                  className="mb-2 w-24 h-24 object-cover rounded-md"
+                  className="mb-2 w-full h-48 object-cover rounded-md"
                 />
-                <h3 className="text-lg font-semibold">Title: {post.title}</h3>
-                <p>Content: {post.content}</p>
-                <p>Author ID: {post.author}</p>
+                <h3 className="text-lg font-semibold">{post.title}</h3>
+                <p>작성자 ID: {post.author}</p>
+                <p>작성 일자: {new Date(post.created_at).toLocaleDateString()}</p>
               </li>
             ))}
           </ul>
@@ -137,41 +114,26 @@ const SuccessAlbum = () => {
 
       {/* Modal */}
       {selectedPost && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-[800px] w-full">
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeModal();
+          }}
+        >
+          <div className="bg-white p-6 rounded-lg shadow-lg min-w-[400px] max-w-[1000px]">
             <div className="mb-2">
-              <h3 className="text-xl font-bold mb-4">{selectedPost.title}</h3>
-              <p className="mb-4">{selectedPost.content}</p>
+              <img
+                src={selectedPost.image}
+                alt="미션 성공 이미지"
+                className="w-full min-h-[400px] max-h-[600px] object-contain rounded-md"
+              />
             </div>
-            {selectedPost.comments && selectedPost.comments.length > 0 && (
-              <div className="mb-4">
-                <h4 className="font-semibold">댓글:</h4>
-                {selectedPost.comments.map((comment, index) => (
-                  <p key={index} className="border-b border-gray-300 mb-2 pb-2">
-                    <strong>{comment.username}:</strong> {comment.content}
-                  </p>
-                ))}
-              </div>
-            )}
-            <textarea
-              className="w-full p-2 border rounded mb-4"
-              placeholder="댓글을 입력하세요"
-              rows={4}
-              onChange={(e) => setComment(e.target.value)}
-              value={comment}
-            ></textarea>
             <div className="flex justify-end gap-2">
               <button
                 className="px-4 py-2 bg-custom_teal-400 text-black rounded"
                 onClick={closeModal}
               >
                 닫기
-              </button>
-              <button
-                onClick={addComment}
-                className="px-4 py-2 bg-custom_teal-400 text-black rounded"
-              >
-                댓글 작성
               </button>
             </div>
           </div>

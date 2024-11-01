@@ -56,7 +56,8 @@ const CreateSuccessPost = () => {
   };
 
   const mutation = useMutation(postSuccess, {
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Success data:', data); // 받아온 데이터 콘솔로 확인
       alert('게시글이 성공적으로 업로드됐어요!');
       setTitle('');
       setContent('');
@@ -72,7 +73,6 @@ const CreateSuccessPost = () => {
   const handlePostSubmit = () => {
     mutation.mutate({
       title,
-      content,
       image: selectedImage,
       author: parseInt(localStorage.getItem('userId') || '1', 10), // 이거 좋은 방법이 아님, 서버에서 userId를 날려주는 것이 좋을 듯
     });
@@ -114,17 +114,6 @@ const CreateSuccessPost = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-
-          <label htmlFor="content" className="block text-black mt-4 mb-1">
-            글 내용
-          </label>
-          <textarea
-            id="content"
-            className="SuccessPost_textarea w-full mt-2 p-2 min-h-[200px] border border-gray-300 rounded"
-            placeholder="내용을 입력하세요"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          ></textarea>
         </div>
 
         <div className="SuccessPost_buttonContainer flex items-center justify-end">

@@ -10,6 +10,7 @@ import CreateSuccessPost from 'pages/success-post/CreateSuccessPost';
 import SignUpPage from 'pages/SignUp/SignUpPage';
 import LoginPage from 'pages/login/Login';
 import ProtectedRoute from 'routes/ProtectedRoute';
+import Comment from 'pages/comment/Comment';
 import ProfileSettingPage from 'pages/ProfileSettings/ProfileSettingPage';
 
 const RouterComponent = () => {
@@ -32,6 +33,10 @@ const RouterComponent = () => {
         <Route
           path="/success-album"
           element={<ProtectedRoute element={<SuccessAlbum />} isAuthenticated={isAuthenticated} />}
+        />
+        <Route
+          path="/recruitment/:id"
+          element={<ProtectedRoute element={<Comment />} isAuthenticated={isAuthenticated} />}
         />
         <Route
           path="/notification"

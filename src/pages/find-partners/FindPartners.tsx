@@ -19,7 +19,6 @@ interface PartnerProps {
 
 const FindPartners = () => {
   const navigate = useNavigate();
-  const [selectedPost, setSelectedPost] = useState<PartnerProps | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [comment, setComment] = useState('');
 
@@ -50,28 +49,8 @@ const FindPartners = () => {
     navigate('/create-partner-post');
   };
 
-  const openModal = (post: PartnerProps) => {
-    setSelectedPost(post);
-    window.history.pushState(null, '', `/find-partners/${post.id}`);
-  };
-
-  const closeModal = () => {
-    setSelectedPost(null);
-    setComment('');
-    navigate('/find-partners');
-  };
-
-  const addComment = () => {
-    if (selectedPost && comment.trim()) {
-      if (!selectedPost.comments) {
-        selectedPost.comments = [];
-      }
-
-      selectedPost.comments.push({ username: selectedPost.author, content: comment });
-
-      setSelectedPost({ ...selectedPost });
-      setComment('');
-    }
+  const openCommentPage = (post: PartnerProps) => {
+    navigate(`/recruitment/${post.id}`, { state: post });
   };
 
   const goToPreviousPage = () => {
@@ -101,7 +80,7 @@ const FindPartners = () => {
               <li
                 key={partner.id}
                 className="bg-white p-4 my-2 rounded-lg shadow-md hover:bg-background_elevated transition duration-200 cursor-pointer"
-                onClick={() => openModal(partner)}
+                onClick={() => openCommentPage(partner)}
               >
                 <h3 className="text-lg font-semibold">제목: {partner.title}</h3>
                 <p>내용: {partner.content}</p>
@@ -129,49 +108,6 @@ const FindPartners = () => {
           </div>
         </div>
       </div>
-
-      {/* Modal */}
-      {selectedPost && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-[800px] w-full">
-            <div className="mb-2">
-              <h3 className="text-xl font-bold mb-4">{selectedPost.title}</h3>
-              <p className="mb-4">{selectedPost.content}</p>
-            </div>
-            {selectedPost.comments && selectedPost.comments.length > 0 && (
-              <div className="mb-4">
-                <h4 className="font-semibold">댓글:</h4>
-                {selectedPost.comments.map((comment, index) => (
-                  <p key={index} className="border-b border-gray-300 mb-2 pb-2">
-                    <strong>{comment.username}:</strong> {comment.content}
-                  </p>
-                ))}
-              </div>
-            )}
-            <textarea
-              className="w-full p-2 border rounded mb-4"
-              placeholder="댓글을 입력하세요"
-              rows={4}
-              onChange={(e) => setComment(e.target.value)}
-              value={comment}
-            ></textarea>
-            <div className="flex justify-end gap-2">
-              <button
-                className="px-4 py-2 bg-custom_teal-400 text-black rounded"
-                onClick={closeModal}
-              >
-                닫기
-              </button>
-              <button
-                onClick={addComment}
-                className="px-4 py-2 bg-custom_teal-400 text-black rounded"
-              >
-                댓글 작성
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
