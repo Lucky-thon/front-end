@@ -3,7 +3,11 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
-const LoginPage: React.FC = () => {
+interface LoginPageProps {
+  setIsAuthenticated: (value: boolean) => void;
+}
+
+const LoginPage: React.FC<LoginPageProps> = ({ setIsAuthenticated }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
@@ -26,6 +30,7 @@ const LoginPage: React.FC = () => {
       console.log('로그인 성공:', response.data);
       localStorage.setItem('username', response.data.username);
       localStorage.setItem('token', response.data.token);
+      setIsAuthenticated(true); // 로그인 성공 시 인증 상태를 true로 설정
       navigate('/');
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {

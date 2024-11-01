@@ -18,12 +18,12 @@ const RouterComponent = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     setIsAuthenticated(!!token);
-  }, [localStorage.getItem('token')]); // 토큰이 변경될 때마다 인증 상태 업데이트
+  }, []);
 
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route
           path="/find-partners"
