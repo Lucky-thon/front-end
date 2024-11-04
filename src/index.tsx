@@ -4,6 +4,7 @@ import App from './App';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { RecoilRoot } from 'recoil';
 
 import axios from 'axios';
 
@@ -35,7 +36,9 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <App />
+      <RecoilRoot>
+        <App />
+      </RecoilRoot>
     </QueryClientProvider>
   </React.StrictMode>,
 );
