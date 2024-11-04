@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { useMutation } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import NavigationBar from 'shared/ui/NavigationBar';
+import { useSetRecoilState } from 'recoil';
+import { hasPostedInMissionSuccessState } from 'recoil/missionState';
 
 const CreateSuccessPost = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const setHasPosted = useSetRecoilState(hasPostedInMissionSuccessState); // 게시판 활성 상태 저장
 
   // 이미지 선택 핸들러 함수
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,17 +55,18 @@ const CreateSuccessPost = () => {
       throw new Error('게시글 업로드 실패');
     }
 
-    return await response.json();
+    const data = await response.json();
+    return data.hasPostedInMissionSuccess; // 서버에서 반환된 활성 상태
   };
 
   const mutation = useMutation(postSuccess, {
     onSuccess: (data) => {
       console.log('Success data:', data); // 받아온 데이터 콘솔로 확인
-      console.log(data.auth);
       alert('게시글이 성공적으로 업로드됐어요!');
       setTitle('');
       setContent('');
       setSelectedImage(null);
+      setHasPosted(data.has_posted_in_mission_success); // Recoil 상태 업데이트
       navigate('/success-album'); // 미션 성공 게시판으로 이동
     },
     onError: (error) => {

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavigationBar from 'shared/ui/NavigationBar';
 import axios from 'axios';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { hasPostedInMissionSuccessState } from '../../recoil/missionState';
 
 interface SuccessPostProps {
   id: number;
@@ -15,12 +17,12 @@ const SuccessAlbum = () => {
   const navigate = useNavigate();
   const [selectedPost, setSelectedPost] = useState<SuccessPostProps | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
+  const hasPostedInMissionSuccess = useRecoilValue(hasPostedInMissionSuccessState);
+  const setHasPostedInMissionSuccess = useSetRecoilState(hasPostedInMissionSuccessState);
   const itemsPerPage = 9;
 
-  const [hasPostedInMissionSuccess, setHasPostedInMissionSuccess] = useState(false);
   const [successPosts, setSuccessPosts] = useState<SuccessPostProps[]>([]);
 
-  // 데이터 가져오기 함수
   const fetchSuccessPosts = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -33,23 +35,18 @@ const SuccessAlbum = () => {
         { headers: { Authorization: `Token ${token}` } },
       );
 
-      setHasPostedInMissionSuccess(response.data.has_posted_in_mission_success);
+      setHasPostedInMissionSuccess(response.data.has_posted_in_mission_success || false);
       setSuccessPosts(response.data.successPosts || []);
     } catch (error) {
       console.error(error);
+      setHasPostedInMissionSuccess(false);
     }
   };
 
-  // 컴포넌트가 처음 렌더링될 때 데이터 가져오기
   useEffect(() => {
     fetchSuccessPosts();
   }, []);
 
-  useEffect(() => {
-    console.log('미션 성공 상태:', hasPostedInMissionSuccess);
-  }, [hasPostedInMissionSuccess]);
-
-  // 페이지네이션 관련 설정
   const totalPages = Math.ceil(successPosts.length / itemsPerPage);
   const paginatedPosts = successPosts.slice(
     currentPage * itemsPerPage,
@@ -68,43 +65,6 @@ const SuccessAlbum = () => {
 
   const goToNextPage = () => {
     if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1);
-  };
-
-  // 새 게시글 업로드 후 상태 업데이트
-  const handleUploadSuccessPost = async (newPost: any) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('로그인 토큰이 없습니다.');
-      }
-
-      const formData = new FormData();
-      formData.append('title', newPost.title);
-      formData.append('content', newPost.content);
-      formData.append('author', String(newPost.author));
-      if (newPost.image) {
-        formData.append('image', newPost.image);
-      }
-
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_SERVER_URL}/board/api/mission-success/create/`,
-        formData,
-        {
-          headers: {
-            Authorization: `Token ${token}`,
-            Accept: 'application/json',
-          },
-        },
-      );
-
-      // 업로드 성공 시 상태 업데이트 및 게시글 목록 다시 가져오기
-      if (response.data.has_posted_in_mission_success) {
-        setHasPostedInMissionSuccess(true);
-      }
-      await fetchSuccessPosts(); // 게시글 목록 다시 불러오기
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   return (
